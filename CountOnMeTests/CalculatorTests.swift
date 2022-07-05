@@ -12,57 +12,93 @@ import XCTest
 class CalculatorTests: XCTestCase {
 
     var calc: Calculator!
-    
+
     override func setUp() {
         super.setUp()
-        
+
         calc = Calculator()
     }
-    
+
     func testGivenInstanceOfCalculator_WhenAccessingIt_ThenItExist() {
         XCTAssertNotNil(calc)
     }
-    
+
     func testGivenNoExpression_WhenCreateExpression_ThenExpressionIsConvertToArrayOfElements() {
         calc.expression = "44 + 33"
-        
+
         XCTAssertEqual(calc.expression, "44 + 33")
         XCTAssertEqual(calc.elements, ["44", "+", "33"])
     }
-    
+
     func testGivenSimpleAdditionExpression_WhenCalculate_ThenResultIsCorrect() {
         calc.expression = "35 + 6"
-        
-        XCTAssertEqual(calc.result, 41)
+
+        XCTAssertEqual(calc.result, "41")
     }
-    
+
     func testGivenSimpleSubstractionExpression_WhenCalculate_ThenResultIsCorrect() {
         calc.expression = "35 - 6"
-        
-        XCTAssertEqual(calc.result, 29)
+
+        XCTAssertEqual(calc.result, "29")
     }
 
     func testGivenSimpleMultiplicationExpression_WhenCalculate_ThenResultIsCorrect() {
         calc.expression = "3 x 6"
-        
-        XCTAssertEqual(calc.result, 18)
+
+        XCTAssertEqual(calc.result, "18")
     }
 
     func testGivenSimpleDivisionExpression_WhenCalculate_ThenResultIsCorrect() {
-        calc.expression = "6 / 3"
-        
-        XCTAssertEqual(calc.result, 2)
+        calc.expression = "6 ÷ 3"
+
+        XCTAssertEqual(calc.result, "2")
     }
-    
+
     func testGivenExpressionWithPriority_WhenCalculate_ThenResultIsCorrect() {
-        calc.expression = "3 + 4 x 4 - 8 / 2"
-        
-        XCTAssertEqual(calc.result, 15)
+        calc.expression = "3 + 4 x 4 - 9 ÷ 2"
+
+        XCTAssertEqual(calc.result, "14.5")
     }
-    
-    func testGivenExpression_WhenIsValidExpression_ThenExpressionIsValid() {
-        calc.expression = "3 + 4 x 4 - 8 / 2"
-        
+
+    func testGivenLongExpression_WhenIsValidExpression_ThenExpressionIsValid() {
+        calc.expression = "3 + 4 x 4 - 8 ÷ 2"
+
         XCTAssertTrue(calc.expressionIsCorrect)
+    }
+
+    func testGivenExpressionWithError_WhenLastElementIsOperator_ThenExpressionIsInvalid() {
+        calc.expression = "3 + 4 x 4 - 8 ÷ -"
+
+        XCTAssertFalse(calc.expressionIsCorrect)
+    }
+
+    func testGivenExpressionWithError_WhenNumberOfElementNotCorrect_ThenExpressionIsInvalid() {
+        calc.expression = "3 + 4 x 4 - 8 ÷"
+
+        XCTAssertFalse(calc.expressionIsCorrect)
+    }
+
+    func testGivenExpression_WhenTestCanAddOperator_ThenSucess() {
+        calc.expression = "3 + 4 x 4 - 8"
+
+        XCTAssertTrue(calc.canAddOperator)
+    }
+
+    func testGivenExpressionLastElementIsOperator_WhenTestCanAddOperator_ThenError() {
+        calc.expression = "3 + 4 x 4 -"
+
+        XCTAssertFalse(calc.canAddOperator)
+    }
+
+    func testGivenEmptyExpression_WhenGetResult_ThenError() {
+        calc.expression = ""
+
+        XCTAssertNil(calc.result)
+    }
+
+    func testGivenExpressionWithDivisionBy0_WhenResolve_ThenErrorDivisionBy0() {
+        calc.expression = "3 + 4 ÷ 0"
+
+        XCTAssertFalse(calc.expressionIsCorrect)
     }
 }
