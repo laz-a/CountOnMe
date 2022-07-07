@@ -57,6 +57,7 @@ class CalculatorTests: XCTestCase {
     func testGivenExpressionWithPriority_WhenCalculate_ThenResultIsCorrect() {
         calc.expression = "3 + 4 x 4 - 9 ÷ 2"
 
+        XCTAssertFalse(calc.divisionByZero)
         XCTAssertEqual(calc.result, "14.5")
     }
 
@@ -99,6 +100,6 @@ class CalculatorTests: XCTestCase {
     func testGivenExpressionWithDivisionBy0_WhenResolve_ThenErrorDivisionBy0() {
         calc.expression = "3 + 4 ÷ 0"
 
-        XCTAssertFalse(calc.expressionIsCorrect)
+        XCTAssertTrue(calc.divisionByZero)
     }
 }

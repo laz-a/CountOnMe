@@ -19,14 +19,11 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
 
         textView.text = ""
+    }
 
-        /*$$$$$$$$$$$$$$$$$*/
-        calc.expression = "33 + 3 ÷ 20 + 5 x 5 - 99 ÷ 10"
-        print(calc.expression)
-        print(calc.elements)
-        print(calc.expressionIsCorrect)
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-//        print(calc.result)
+    @IBAction func tappedClearButton(_ sender: UIButton) {
+        textView.text = ""
+        calc.expression = ""
     }
 
     // View actions
@@ -40,6 +37,14 @@ class ViewController: UIViewController {
         if calc.lastResult != nil {
             calc.lastResult = nil
             textView.text = ""
+        }
+
+        if calc.elements.last == "0" {
+            if numberText == "0" {
+                return
+            } else {
+                textView.text.removeLast()
+            }
         }
 
         textView.text.append(numberText)
@@ -83,6 +88,16 @@ class ViewController: UIViewController {
             let alertVC = UIAlertController(
                 title: "Zéro!",
                 message: "Entrez une expression correcte !",
+                preferredStyle: .alert
+            )
+            alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            return self.present(alertVC, animated: true, completion: nil)
+        }
+
+        guard !calc.divisionByZero else {
+            let alertVC = UIAlertController(
+                title: "Zéro!",
+                message: "Division par 0 interdit !",
                 preferredStyle: .alert
             )
             alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
