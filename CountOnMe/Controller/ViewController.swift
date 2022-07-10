@@ -57,32 +57,20 @@ class ViewController: UIViewController {
 
         calc.expression = textView.text
 
-        print(calc.expression)
-        print(calc.elements)
-        print(calc.canAddOperator)
-
-        if calc.canAddOperator {
-            if let lastResult = calc.lastResult {
-                calc.lastResult = nil
-                textView.text = "\(lastResult)"
-            }
-            textView.text.append(" \(operatorText) ")
-        } else {
-            let alertVC = UIAlertController(
-                title: "Zéro!",
-                message: "Un operateur est déja mis !",
-                preferredStyle: .alert
-            )
-            alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-            self.present(alertVC, animated: true, completion: nil)
+        if let lastResult = calc.lastResult {
+            textView.text = "\(lastResult)"
+            calc.lastResult = nil
         }
+
+        if calc.lastElementIsAnOperator {
+            textView.text.removeLast(3)
+        }
+
+        textView.text.append(" \(operatorText) ")
     }
 
     @IBAction func tappedEqualButton(_ sender: UIButton) {
         calc.expression = textView.text
-
-        print(calc.expression)
-        print(calc.elements)
 
         guard calc.expressionIsCorrect else {
             let alertVC = UIAlertController(
@@ -105,7 +93,6 @@ class ViewController: UIViewController {
         }
 
         if let result = calc.result {
-            print(result)
             textView.text.append(" = \(result)")
         }
     }

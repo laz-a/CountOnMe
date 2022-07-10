@@ -14,7 +14,7 @@ class Calculator {
 
     // Expression in String format
     var expression: String = ""
-    
+
     // Array of elements of String expression
     var elements: [String] {
         return expression.split(separator: " ").map { "\($0)" }
@@ -50,10 +50,10 @@ class Calculator {
         return false
     }
 
-    // Test if user can add operator
-    var canAddOperator: Bool {
-        // Return true, if last elements of expression is a number
-        if let lastElement = elements.last, Float(lastElement) != nil {
+    // Test if last element is an operator
+    var lastElementIsAnOperator: Bool {
+        // Return true, if last elements of expression is an operator
+        if let lastElement = elements.last, Float(lastElement) == nil {
             return true
         }
         return false
