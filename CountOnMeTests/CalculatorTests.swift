@@ -9,7 +9,7 @@
 import XCTest
 @testable import CountOnMe
 
-class CalculatorTests: XCTestCase {
+final class CalculatorTests: XCTestCase {
 
     var calc: Calculator!
 
@@ -82,13 +82,13 @@ class CalculatorTests: XCTestCase {
     func testGivenExpression_WhenTestCanAddOperator_ThenSucess() {
         calc.expression = "3 + 4 x 4 - 8"
 
-        XCTAssertTrue(calc.canAddOperator)
+        XCTAssertFalse(calc.lastElementIsAnOperator)
     }
 
     func testGivenExpressionLastElementIsOperator_WhenTestCanAddOperator_ThenError() {
         calc.expression = "3 + 4 x 4 -"
 
-        XCTAssertFalse(calc.canAddOperator)
+        XCTAssertTrue(calc.lastElementIsAnOperator)
     }
 
     func testGivenEmptyExpression_WhenGetResult_ThenError() {

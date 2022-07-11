@@ -8,7 +8,7 @@
 
 import Foundation
 
-class Calculator {
+final class Calculator {
     // Autorized operators
     private var operators = ["+", "-", "x", "÷"]
 
