@@ -86,19 +86,18 @@ final class Calculator {
 
                 // Get the numbers before and after the operator
                 if let firstNumber = Float(operations[idx - 1]), let secondNumber = Float(operations[idx + 1]) {
+                    var result: Float
                     // Make the operation according to operator
                     switch operations[idx] {
-                    case "x": operations[idx - 1] = "\(firstNumber * secondNumber)"
-                    case "÷": operations[idx - 1] = "\(firstNumber / secondNumber)"
-                    case "+": operations[idx - 1] = "\(firstNumber + secondNumber)"
-                    case "-": operations[idx - 1] = "\(firstNumber - secondNumber)"
-                    default: break
+                    case "x": result = firstNumber * secondNumber
+                    case "÷": result = firstNumber / secondNumber
+                    case "+": result = firstNumber + secondNumber
+                    case "-": result = firstNumber - secondNumber
+                    default: result = 0
                     }
+                    // Remove elements of performed operation
+                    operations.replaceSubrange((idx - 1)...(idx + 1), with: ["\(result)"])
                 }
-
-                // Remove elements of performed operation
-                operations.remove(at: idx + 1)
-                operations.remove(at: idx)
             }
         }
 

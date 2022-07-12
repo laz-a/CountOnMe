@@ -90,7 +90,7 @@ final class ViewController: UIViewController {
         calc.expression = textView.text
 
         // If expression is not correct, dipslay allert
-        guard calc.expressionIsCorrect else {
+        if !calc.expressionIsCorrect {
             let alertVC = UIAlertController(
                 title: "Expression incorrecte",
                 message: "Entrez une expression valide !",
