@@ -25,9 +25,9 @@ final class Calculator {
         // Expression must have odd number of elements
         if elements.count % 2 == 1 {
             // For each elements
-            for (idx, value) in elements.enumerated() {
+            for (index, value) in elements.enumerated() {
                 // Even indexes must contain number, odd indexes must contain operator
-                if (idx % 2 == 0 && Float(value) == nil) || (idx % 2 == 1 && !operators.contains(value)) {
+                if (index % 2 == 0 && Double(value) == nil) || (index % 2 == 1 && !operators.contains(value)) {
                     return false
                 }
             }
@@ -39,10 +39,10 @@ final class Calculator {
     // Test if division by 0 is present
     var divisionByZero: Bool {
         // Look for ÷ operator in expression
-        for (idx, value) in elements.enumerated() where value == "÷" {
+        for (index, value) in elements.enumerated() where value == "÷" {
             // If next elements of ÷ is 0 return true
-            if elements.indices.contains(idx + 1) {
-                if let nextElement = Float(elements[idx + 1]), nextElement == 0 {
+            if elements.indices.contains(index + 1) {
+                if let nextElement = Double(elements[index + 1]), nextElement == 0 {
                     return true
                 }
             }
@@ -53,7 +53,7 @@ final class Calculator {
     // Test if last element is an operator
     var lastElementIsAnOperator: Bool {
         // Return true, if last elements of expression is an operator
-        if let lastElement = elements.last, Float(lastElement) == nil {
+        if let lastElement = elements.last, Double(lastElement) == nil {
             return true
         }
         return false
@@ -63,7 +63,7 @@ final class Calculator {
     var result: String? {
         if let res = getResult() {
             // Save result in an other variable
-            lastResult = floatToString(res)
+            lastResult = res.toString
             return lastResult
         }
         return nil
@@ -73,27 +73,29 @@ final class Calculator {
     var lastResult: String?
 
     // Make the operation
-    private func getResult() -> Float? {
+    private func getResult() -> Double? {
 
         // Copy of elements of expression
         var operations = elements
 
         // While we have more than 1 element in operations array
         while operations.count > 1 {
-            print(operations)
             if let idx = operations.firstIndex(of: ["x", "÷"]) ?? operations.firstIndex(of: ["+", "-"]) {
-                print(operations[idx])
-
                 // Get the numbers before and after the operator
-                if let firstNumber = Float(operations[idx - 1]), let secondNumber = Float(operations[idx + 1]) {
-                    var result: Float
+                if let firstNumber = Double(operations[idx - 1]), let secondNumber = Double(operations[idx + 1]) {
+                    var result: Double
                     // Make the operation according to operator
                     switch operations[idx] {
-                    case "x": result = firstNumber * secondNumber
-                    case "÷": result = firstNumber / secondNumber
-                    case "+": result = firstNumber + secondNumber
-                    case "-": result = firstNumber - secondNumber
-                    default: result = 0
+                    case "x":
+                        result = firstNumber * secondNumber
+                    case "÷":
+                        result = firstNumber / secondNumber
+                    case "+":
+                        result = firstNumber + secondNumber
+                    case "-":
+                        result = firstNumber - secondNumber
+                    default:
+                        result = 0
                     }
                     // Remove elements of performed operation
                     operations.replaceSubrange((idx - 1)...(idx + 1), with: ["\(result)"])
@@ -102,21 +104,16 @@ final class Calculator {
         }
 
         // Return result if result is a number
-        if let res = operations.first, Float(res) != nil {
-            return Float(res)
+        if let res = operations.first, Double(res) != nil {
+            return Double(res)
         }
 
         // else return nil
         return nil
     }
-
-    // Return number in elegant string (2.0 become 2, 2.5 still 2.5)
-    private func floatToString(_ float: Float) -> String? {
-        Float(Int(float)) == float ? "\(Int(float))" : "\(float)"
-    }
 }
 
-// Extension of Array type
+// Extension of Array
 extension Array where Element: Equatable {
     // Return first index of multiple elements of an array type variable
     func firstIndex(of items: [Element]) -> Int? {
@@ -131,5 +128,15 @@ extension Array where Element: Equatable {
 
         // Return the lower index
         return result.min()
+    }
+}
+
+// Extension of Double
+extension Double {
+    // Return double in elegant string (2.0 become 2, 2.5 still 2.5)
+    var toString: String {
+        let str = String(self)
+        return str.range(of: #"\.0$"#, options: .regularExpression) != nil ? String(str.dropLast(2)) : str
+//        return self.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", self) : String(self)
     }
 }

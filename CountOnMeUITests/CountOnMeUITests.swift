@@ -83,12 +83,12 @@ class CountOnMeUITests: XCTestCase {
         app.buttons["6"].tap()
         app.buttons["="].tap()
         app.buttons["6"].tap()
-        app.buttons["+"].tap()
-        app.buttons["3"].tap()
+        app.buttons["÷"].tap()
+        app.buttons["4"].tap()
         app.buttons["="].tap()
 
         // Use XCTAssert and related functions to verify your tests produce the correct results.
-        XCTAssertEqual(app.textViews.element.value as? String, "6 + 3 = 9")
+        XCTAssertEqual(app.textViews.element.value as? String, "6 ÷ 4 = 1.5")
     }
 
     func testGivenErrorExpression_WhenEqualButtonTapped_ThenAlertError() {

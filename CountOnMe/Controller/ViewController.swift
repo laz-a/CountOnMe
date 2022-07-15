@@ -90,7 +90,7 @@ final class ViewController: UIViewController {
         calc.expression = textView.text
 
         // If expression is not correct, dipslay allert
-        if !calc.expressionIsCorrect {
+        guard calc.expressionIsCorrect else {
             let alertVC = UIAlertController(
                 title: "Expression incorrecte",
                 message: "Entrez une expression valide !",
@@ -101,7 +101,7 @@ final class ViewController: UIViewController {
         }
 
         // If expression contain division by 0, alert error
-        if calc.divisionByZero {
+        guard !calc.divisionByZero else {
             let alertVC = UIAlertController(
                 title: "Division par zéro",
                 message: "Division par 0 interdit !",
@@ -112,8 +112,10 @@ final class ViewController: UIViewController {
         }
 
         // Get result and update textView
-        if let result = calc.result {
-            textView.text.append(" = \(result)")
+        guard let result = calc.result else {
+            return
         }
+
+        textView.text.append(" = \(result)")
     }
 }
