@@ -12,16 +12,37 @@ final class Calculator {
     // Autorized operators
     private var operators = ["+", "-", "x", "÷"]
 
-    // Expression in String format
-    var expression: String = ""
+    // Update expression Notification -> ViewController
+    private let updateExpressionNotification = Notification(name: Notification.Name(rawValue: "UpdateExpression"))
 
+    // Expression in String format
+    var expression: String = "" {
+        didSet {
+            // Post notification to update textView
+            NotificationCenter.default.post(updateExpressionNotification)
+        }
+    }
     // Array of elements of String expression
-    var elements: [String] {
+    private var elements: [String] {
         return expression.split(separator: " ").map { "\($0)" }
     }
 
+    // Result of the last operation
+    private var lastResult: String? {
+        // Get 2 last elements
+        let lastOperation = elements.suffix(2)
+
+        // If before last element is an =
+        if lastOperation.first == "=" {
+            // Return last element (result of previous expression)
+            return lastOperation.last
+        } else {
+            return nil
+        }
+    }
+
     // Test if expression if correct
-    var expressionIsCorrect: Bool {
+    private var expressionIsCorrect: Bool {
         // Expression must have odd number of elements
         if elements.count % 2 == 1 {
             // For each elements
@@ -35,9 +56,9 @@ final class Calculator {
         }
         return false
     }
-
+    
     // Test if division by 0 is present
-    var divisionByZero: Bool {
+    private var divisionByZero: Bool {
         // Look for ÷ operator in expression
         for (index, value) in elements.enumerated() where value == "÷" {
             // If next elements of ÷ is 0 return true
@@ -49,33 +70,76 @@ final class Calculator {
         }
         return false
     }
-
     // Test if last element is an operator
-    var lastElementIsAnOperator: Bool {
+    private var lastElementIsAnOperator: Bool {
         // Return true, if last elements of expression is an operator
-        if let lastElement = elements.last, Double(lastElement) == nil {
+        if let lastElement = elements.last, operators.contains(lastElement) {
             return true
         }
         return false
     }
 
-    // Return the result of operation
-    var result: String? {
-        if let res = getResult() {
-            // Save result in an other variable
-            lastResult = res.toString
-            return lastResult
+    // Add number to expression
+    func addNumber(_ numberText: String) {
+        // If lastResult exist, clear expression
+        if lastResult != nil {
+            expression = ""
         }
-        return nil
+
+        // Prevent to start number with multiple 0
+        if elements.last == "0" {
+            if numberText == "0" {
+                return
+            } else {
+                // Ex : 05 -> 5
+                expression.removeLast()
+            }
+        }
+
+        // Update expression
+        expression += numberText
+    }
+    
+    // Add operator to expression
+    func addOperator(_ operatorText: String) {
+        // Prevent to start expression with an operator
+        guard !expression.isEmpty else {
+            return
+        }
+
+        // If lastResult exist, set lastResult as first element of expression
+        if let lResult = lastResult {
+            expression = lResult
+        }
+
+        // If last element of expression is an operator, remove this element from expression
+        if lastElementIsAnOperator {
+            expression.removeLast(3)
+        }
+
+        // Uptade expression
+        expression += " \(operatorText) "
     }
 
-    // Result of the last operation
-    var lastResult: String?
+    // Get result of expression or error
+    func result() throws {
 
-    // Make the operation
-    private func getResult() -> Double? {
+        // Return if expression is empty or where result already exist
+        guard !expression.isEmpty && lastResult == nil else {
+            return
+        }
 
-        // Copy of elements of expression
+        // Throw error for incorrect expression
+        guard expressionIsCorrect else {
+            throw CalcError.incorrectExpression
+        }
+
+        // Throw error when division by 0 in expression
+        guard !divisionByZero else {
+            throw CalcError.divisionByZero
+        }
+
+        // Copy elements of expression in local variable
         var operations = elements
 
         // While we have more than 1 element in operations array
@@ -83,33 +147,64 @@ final class Calculator {
             if let idx = operations.firstIndex(of: ["x", "÷"]) ?? operations.firstIndex(of: ["+", "-"]) {
                 // Get the numbers before and after the operator
                 if let firstNumber = Double(operations[idx - 1]), let secondNumber = Double(operations[idx + 1]) {
-                    var result: Double
+
                     // Make the operation according to operator
-                    switch operations[idx] {
-                    case "x":
-                        result = firstNumber * secondNumber
-                    case "÷":
-                        result = firstNumber / secondNumber
-                    case "+":
-                        result = firstNumber + secondNumber
-                    case "-":
-                        result = firstNumber - secondNumber
-                    default:
-                        result = 0
-                    }
+                    let result = calcul(firstNumber, operations[idx], secondNumber)
+
                     // Remove elements of performed operation
                     operations.replaceSubrange((idx - 1)...(idx + 1), with: ["\(result)"])
                 }
             }
         }
 
-        // Return result if result is a number
-        if let res = operations.first, Double(res) != nil {
-            return Double(res)
+        // If result is a number : update expression
+        if let res = operations.first, let result = Double(res) {
+            expression += " = \(result.toString)"
+        } else {
+            throw CalcError.unknowError
         }
+    }
+    
+    // Return calculation result
+    private func calcul(_ firstNumber: Double, _ operation: String, _ secondNumber: Double) -> Double {
+        var result: Double
+        switch operation {
+        case "x":
+            result = firstNumber * secondNumber
+        case "÷":
+            result = firstNumber / secondNumber
+        case "+":
+            result = firstNumber + secondNumber
+        case "-":
+            result = firstNumber - secondNumber
+        default:
+            result = 0
+        }
+        return result
+    }
 
-        // else return nil
-        return nil
+    // Clear expression
+    func clearExpression() {
+        expression = ""
+    }
+}
+
+// Calculation errors
+enum CalcError: String, Error {
+    case incorrectExpression
+    case divisionByZero
+    case unknowError
+}
+extension CalcError: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+        case .incorrectExpression:
+            return NSLocalizedString("Expression incorrecte", comment: "Invalid Email")
+        case .divisionByZero:
+            return NSLocalizedString("Division par 0", comment: "Invalid Password")
+        case .unknowError:
+            return NSLocalizedString("Erreur inconnue", comment: "Invalid Phone Number")
+        }
     }
 }
 

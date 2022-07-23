@@ -21,85 +21,145 @@ final class CalculatorTests: XCTestCase {
 
     func testGivenInstanceOfCalculator_WhenAccessingIt_ThenItExist() {
         XCTAssertNotNil(calc)
+        XCTAssertEqual(calc.expression, "")
     }
 
     func testGivenNoExpression_WhenCreateExpression_ThenExpressionIsConvertToArrayOfElements() {
-        calc.expression = "44 + 33"
+        calc.addNumber("44")
+        calc.addOperator("+")
+        calc.addNumber("33")
 
         XCTAssertEqual(calc.expression, "44 + 33")
-        XCTAssertEqual(calc.elements, ["44", "+", "33"])
+//        XCTAssertEqual(calc.elements, ["44", "+", "33"])
     }
 
-    func testGivenSimpleAdditionExpression_WhenCalculate_ThenResultIsCorrect() {
-        calc.expression = "35 + 6"
+    func testGivenSimpleAddition_WhenCalculate_ThenResultIsCorrect() {
+        calc.addNumber("35")
+        calc.addOperator("+")
+        calc.addNumber("6")
+        try? calc.result()
 
-        XCTAssertEqual(calc.result, "41")
+        XCTAssertEqual(calc.expression, "35 + 6 = 41")
     }
 
-    func testGivenSimpleSubstractionExpression_WhenCalculate_ThenResultIsCorrect() {
-        calc.expression = "35 - 6"
+    func testGivenSimpleSubstraction_WhenCalculate_ThenResultIsCorrect() {
+        calc.addNumber("35")
+        calc.addOperator("-")
+        calc.addNumber("6")
+        try? calc.result()
 
-        XCTAssertEqual(calc.result, "29")
+        XCTAssertEqual(calc.expression, "35 - 6 = 29")
     }
 
-    func testGivenSimpleMultiplicationExpression_WhenCalculate_ThenResultIsCorrect() {
-        calc.expression = "3 x 6"
+    func testGivenSimpleMultiplication_WhenCalculate_ThenResultIsCorrect() {
+        calc.addNumber("3")
+        calc.addOperator("x")
+        calc.addNumber("6")
+        try? calc.result()
 
-        XCTAssertEqual(calc.result, "18")
+        XCTAssertEqual(calc.expression, "3 x 6 = 18")
     }
 
-    func testGivenSimpleDivisionExpression_WhenCalculate_ThenResultIsCorrect() {
-        calc.expression = "6 ÷ 3"
+    func testGivenSimpleDivision_WhenCalculate_ThenResultIsCorrect() {
+        calc.addNumber("6")
+        calc.addOperator("÷")
+        calc.addNumber("3")
+        try? calc.result()
 
-        XCTAssertEqual(calc.result, "2")
+        XCTAssertEqual(calc.expression, "6 ÷ 3 = 2")
     }
 
     func testGivenExpressionWithPriority_WhenCalculate_ThenResultIsCorrect() {
-        calc.expression = "3 + 4 x 4 - 9 ÷ 2"
+        calc.addNumber("3")
+        calc.addOperator("+")
+        calc.addNumber("4")
+        calc.addOperator("x")
+        calc.addNumber("4")
+        calc.addOperator("-")
+        calc.addNumber("9")
+        calc.addOperator("÷")
+        calc.addNumber("2")
+        try? calc.result()
 
-        XCTAssertFalse(calc.divisionByZero)
-        XCTAssertEqual(calc.result, "14.5")
+        XCTAssertEqual(calc.expression, "3 + 4 x 4 - 9 ÷ 2 = 14.5")
     }
 
-    func testGivenLongExpression_WhenIsValidExpression_ThenExpressionIsValid() {
-        calc.expression = "3 + 4 x 4 - 8 ÷ 2"
+    func testGivenChangeOperatorExpression_WhenGetExpression_ThenExpressionIsCorrect() {
+        calc.addNumber("3")
+        calc.addOperator("+")
+        calc.addOperator("x")
+        calc.addNumber("0")
+        calc.addNumber("0")
+        calc.addNumber("6")
+        try? calc.result()
 
-        XCTAssertTrue(calc.expressionIsCorrect)
+        XCTAssertEqual(calc.expression, "3 x 6 = 18")
     }
 
-    func testGivenExpressionWithError_WhenLastElementIsOperator_ThenExpressionIsInvalid() {
-        calc.expression = "3 + 4 x 4 - 8 ÷ -"
+    func testGivenExpression_WhenUsePrevResult_ThenExpressionIsCorrect() {
+        calc.addNumber("6")
+        calc.addOperator("÷")
+        calc.addNumber("3")
+        try? calc.result()
+        calc.addOperator("x")
+        calc.addNumber("2")
+        try? calc.result()
 
-        XCTAssertFalse(calc.expressionIsCorrect)
+        XCTAssertEqual(calc.expression, "2 x 2 = 4")
     }
 
-    func testGivenExpressionWithError_WhenNumberOfElementNotCorrect_ThenExpressionIsInvalid() {
-        calc.expression = "3 + 4 x 4 - 8 ÷"
+    func testGivenExpression_WhenNewExpression_ThenExpressionIsCorrect() {
+        calc.addNumber("6")
+        calc.addOperator("÷")
+        calc.addNumber("3")
+        try? calc.result()
+        calc.addNumber("3")
+        calc.addOperator("x")
+        calc.addNumber("2")
+        try? calc.result()
 
-        XCTAssertFalse(calc.expressionIsCorrect)
+        XCTAssertEqual(calc.expression, "3 x 2 = 6")
     }
 
-    func testGivenExpression_WhenTestCanAddOperator_ThenSucess() {
-        calc.expression = "3 + 4 x 4 - 8"
+    func testGivenExpression_WhenStartWithOperator_ThenExpressionIsCorrect() {
+        calc.addOperator("x")
+        calc.addNumber("6")
+        calc.addOperator("x")
+        calc.addNumber("3")
+        try? calc.result()
 
-        XCTAssertFalse(calc.lastElementIsAnOperator)
+        XCTAssertEqual(calc.expression, "6 x 3 = 18")
     }
 
-    func testGivenExpressionLastElementIsOperator_WhenTestCanAddOperator_ThenError() {
-        calc.expression = "3 + 4 x 4 -"
+    func testGivenErrorExpression_WhenGetresult_ThenErrorIncorrectExpression() {
+        calc.addNumber("3")
+        calc.addOperator("+")
+        calc.addNumber("4")
+        calc.addOperator("x")
 
-        XCTAssertTrue(calc.lastElementIsAnOperator)
+        XCTAssertThrowsError(try calc.result(), "Error incorrect expression") { error in
+            XCTAssertEqual(error as? CalcError, CalcError.incorrectExpression)
+        }
     }
 
-    func testGivenEmptyExpression_WhenGetResult_ThenError() {
-        calc.expression = ""
+    func testGivenExpressionWithDivisionBy0_WhenGetResult_ThenErrorDivisionBy0() {
+        calc.addNumber("3")
+        calc.addOperator("+")
+        calc.addNumber("4")
+        calc.addOperator("÷")
+        calc.addNumber("0")
 
-        XCTAssertNil(calc.result)
+        XCTAssertThrowsError(try calc.result(), "Error division by 0") { error in
+            XCTAssertEqual(error as? CalcError, CalcError.divisionByZero)
+        }
     }
 
-    func testGivenExpressionWithDivisionBy0_WhenResolve_ThenErrorDivisionBy0() {
-        calc.expression = "3 + 4 ÷ 0"
+    func testGivenExpression_WhenClearExpression_ThenExpressionIsEmpty() {
+        calc.addNumber("3")
+        calc.addOperator("+")
+        calc.addNumber("4")
+        calc.clearExpression()
 
-        XCTAssertTrue(calc.divisionByZero)
+        XCTAssertEqual(calc.expression, "")
     }
 }

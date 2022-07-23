@@ -99,17 +99,18 @@ class CountOnMeUITests: XCTestCase {
         app.buttons["="].tap()
 
         // Use XCTAssert and related functions to verify your tests produce the correct results.
-        XCTAssertEqual(app.alerts.element.label, "Expression incorrecte")
+        XCTAssertEqual(app.alerts.element.label, "Erreur CountOnMe")
     }
 
     func testGivenExpressionWithDivisonBy0_WhenEqualButtonTapped_ThenAlertError() {
         // Use recording to get started writing UI tests.
+        app.buttons["x"].tap()
         app.buttons["5"].tap()
         app.buttons["÷"].tap()
         app.buttons["0"].tap()
         app.buttons["="].tap()
 
         // Use XCTAssert and related functions to verify your tests produce the correct results.
-        XCTAssertEqual(app.alerts.element.label, "Division par zéro")
+        XCTAssertEqual(app.alerts.element.label, "Erreur CountOnMe")
     }
 }

@@ -19,16 +19,22 @@ final class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
 
+        // Listen notification on expression update in model
+        let name = Notification.Name(rawValue: "UpdateExpression")
+        NotificationCenter.default.addObserver(self, selector: #selector(updateExpression), name: name, object: nil)
+
         textView.text = ""
+    }
+
+    // Update textView on notification
+    @objc func updateExpression() {
+        textView.text = calc.expression
     }
 
     // Clear expression/textView on clear button tapped
     @IBAction func tappedClearButton(_ sender: UIButton) {
-        // Clear textView
-        textView.text = ""
-
         // Clear expression in model
-        calc.expression = ""
+        calc.clearExpression()
     }
 
     // On numbers buttons tapped
@@ -38,26 +44,8 @@ final class ViewController: UIViewController {
             return
         }
 
-        // If lastResult exist, remove lastResul and clear textView
-        if calc.lastResult != nil {
-            calc.lastResult = nil
-            textView.text = ""
-        }
-
-        // Prevent to start number with multiple 0
-        if calc.elements.last == "0" {
-            if numberText == "0" {
-                return
-            } else {
-                textView.text.removeLast()
-            }
-        }
-
-        // Update textView
-        textView.text.append(numberText)
-
-        // Update expression in model
-        calc.expression = textView.text
+        // Add number in expression
+        calc.addNumber(numberText)
     }
 
     // On operators buttons tapped
@@ -67,55 +55,25 @@ final class ViewController: UIViewController {
             return
         }
 
-        // If lastResult exist, set lastResult as first element of expression
-        if let lastResult = calc.lastResult {
-            textView.text = "\(lastResult)"
-            calc.lastResult = nil
-        }
-
-        // If last element of expression is an operator, remove this element from expression
-        if calc.lastElementIsAnOperator {
-            textView.text.removeLast(3)
-        }
-
-        // Uptade textView
-        textView.text.append(" \(operatorText) ")
-
-        // Update expression
-        calc.expression = textView.text
+        // Add operator in expression
+        calc.addOperator(operatorText)
     }
 
     // On equal button tapped
     @IBAction func tappedEqualButton(_ sender: UIButton) {
-        calc.expression = textView.text
-
-        // If expression is not correct, dipslay allert
-        guard calc.expressionIsCorrect else {
+        // Get result
+        do {
+            // Try to get result
+            try calc.result()
+        } catch {
+            // On error display alert
             let alertVC = UIAlertController(
-                title: "Expression incorrecte",
-                message: "Entrez une expression valide !",
+                title: "Erreur CountOnMe",
+                message: error.localizedDescription,
                 preferredStyle: .alert
             )
             alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             return self.present(alertVC, animated: true, completion: nil)
         }
-
-        // If expression contain division by 0, alert error
-        guard !calc.divisionByZero else {
-            let alertVC = UIAlertController(
-                title: "Division par zéro",
-                message: "Division par 0 interdit !",
-                preferredStyle: .alert
-            )
-            alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-            return self.present(alertVC, animated: true, completion: nil)
-        }
-
-        // Get result and update textView
-        guard let result = calc.result else {
-            return
-        }
-
-        textView.text.append(" = \(result)")
     }
 }
