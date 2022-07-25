@@ -56,7 +56,7 @@ final class Calculator {
         }
         return false
     }
-    
+
     // Test if division by 0 is present
     private var divisionByZero: Bool {
         // Look for ÷ operator in expression
@@ -99,7 +99,7 @@ final class Calculator {
         // Update expression
         expression += numberText
     }
-    
+
     // Add operator to expression
     func addOperator(_ operatorText: String) {
         // Prevent to start expression with an operator
@@ -164,7 +164,7 @@ final class Calculator {
             throw CalcError.unknowError
         }
     }
-    
+
     // Return calculation result
     private func calcul(_ firstNumber: Double, _ operation: String, _ secondNumber: Double) -> Double {
         var result: Double
