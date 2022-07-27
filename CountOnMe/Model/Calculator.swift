@@ -199,11 +199,11 @@ extension CalcError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .incorrectExpression:
-            return NSLocalizedString("Expression incorrecte", comment: "Invalid Email")
+            return NSLocalizedString("Expression incorrecte", comment: "Invalid expression")
         case .divisionByZero:
-            return NSLocalizedString("Division par 0", comment: "Invalid Password")
+            return NSLocalizedString("Division par 0", comment: "Invalid division by 0")
         case .unknowError:
-            return NSLocalizedString("Erreur inconnue", comment: "Invalid Phone Number")
+            return NSLocalizedString("Erreur inconnue", comment: "Unknow error")
         }
     }
 }
